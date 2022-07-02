@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\ApiControllers\AuthController;
+use App\Http\Controllers\ApiControllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +15,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['prefix' => 'v1'], function () {
+    Route::namespace('ApiControllers')->group(function () {
+        Route::group(['prefix' => 'auth'], function () {
+            Route::post('signup', [AuthController::class, 'signup']);
+            Route::post('signin', [AuthController::class, 'signin']);
+        });
+        Route::group(['middleware' => ['auth.basic']], function () {
+            Route::group(['prefix' => 'orders'], function () {
+                Route::post('', [OrderController::class, 'store']);
+                Route::get('', [OrderController::class, 'show']);
+                Route::put('', [OrderController::class, 'update']);
+            });
+        });
+    });
 });
